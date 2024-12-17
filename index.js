@@ -1,12 +1,9 @@
 require("dotenv").config();
 const express = require("express");
-
 const cors = require("cors");
-
+const path = require("path");
 const app = express();
-
 const mongoose = require("mongoose");
-
 const httpStatusText = require("./utils/httpStatusText");
 
 const url = process.env.MONGO_URL;
@@ -15,6 +12,7 @@ mongoose.connect(url).then(() => {
   console.log("mongodb server started");
 });
 
+app.use("/api/uploads", express.static(path.join(__dirname, "uploads")));
 app.use(cors());
 app.use(express.json());
 

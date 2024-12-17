@@ -9,6 +9,7 @@ const register = asyncWrapper(async (req, res, next) => {
   try {
     const userData = req.body;
     console.log("userData:", userData);
+    console.log("req.file:", req.file);
 
     const isExistUser = await User.findOne({ email: userData.email });
     if (isExistUser) {
@@ -26,13 +27,16 @@ const register = asyncWrapper(async (req, res, next) => {
     const newUser = new User({
       ...userData,
       password: hashedPassword,
+      avatar: req.file.filename,
     });
 
     // Generate JWT Token
 
-    const token = await generateToken({ email: newUser.email, id: newUser._id });
-
-    console.log("token:",token)
+    const token = await generateToken({
+      email: newUser.email,
+      id: newUser._id,
+      role: newUser.role,
+    });
 
     newUser.access_token = token;
 
@@ -74,7 +78,11 @@ const login = asyncWrapper(async (req, res, next) => {
     );
   }
 
-  const access_token = await generateToken({ email: user.email, id: user._id });
+  const access_token = await generateToken({
+    email: user.email,
+    id: user._id,
+    role: user.role,
+  });
 
   res.status(200).json({
     status: httpStatusText.SUCCESS,
